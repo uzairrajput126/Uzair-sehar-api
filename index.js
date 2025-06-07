@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.get("/ytdip", async (req, res) => {
     const { link, format } = req.query;
@@ -14,45 +14,41 @@ app.get("/ytdip", async (req, res) => {
     }
 
     try {
-        let music;
-        let p;
-        let dat;
+        let filename, data;
+        const apiUrl = `https://uzair-sehar-api.onrender.com/dipto/ytDlfuk?link=${link}&format=${format}`;
 
-        if (format === "mp3") {
-            const response = await axios.get(`https://uzair-sehar-api.onrender.com/dipto/ytDlfuk?link=${link}&format=mp3`);
-            dat = response.data;
-            p = `audio_${link}.mp3`;
-        } else if (format === "mp4") {
-            const response = await axios.get(`https://uzair-sehar-api.onrender.com/dipto/ytDlfuk?link=${link}&format=mp4`);
-            dat = response.data;
-            p = `video_${link}.mp4`;
-        } else {
-            return res.status(400).json({ error: "Invalid format specified. Use 'mp3' or 'mp4'." });
-        }
+        const response = await axios.get(apiUrl);
+        data = response.data;
 
-        const filePath = path.join(__dirname, "uzair", p);
-        const rr = await axios.get(dat.downloadLink, {
-            responseType: "arraybuffer"
-        });
-        fs.writeFileSync(filePath, Buffer.from(rr.data));
+        filename = format === "mp3" ? `audio_${link}.mp3` : `video_${link}.mp4`;
 
-        music = `${req.protocol}://${req.get("host")}/uzair/${p}`;
+        const filePath = path.join(__dirname, "uzair", filename);
+        const fileData = await axios.get(data.downloadLink, { responseType: "arraybuffer" });
+
+        fs.writeFileSync(filePath, Buffer.from(fileData.data));
+
+        const fileUrl = `${req.protocol}://${req.get("host")}/uzair/${filename}`;
 
         res.json({
-            title: dat.title || "",
+            title: data.title || "",
             format,
-            quality: dat.quality || "",
-            downloadLink: music,
-            size: dat.size || "",
+            quality: data.quality || "",
+            size: data.size || "",
+            downloadLink: fileUrl,
             author: "Uzair Rajput"
         });
+
     } catch (error) {
-        console.log(error)
-        res.status(500).json({ error: "Failed to fetch data from the external API.", details: error.message });
+        console.error("Error:", error.message);
+        res.status(500).json({ error: "Failed to fetch/download video.", details: error.message });
     }
 });
 
 app.use("/uzair", express.static(path.join(__dirname, "uzair")));
+
+app.get("/", (req, res) => {
+    res.send("✅ YouTube Downloader API is running!");
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
