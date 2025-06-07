@@ -30,13 +30,13 @@ app.get("/ytdip", async (req, res) => {
             return res.status(400).json({ error: "Invalid format specified. Use 'mp3' or 'mp4'." });
         }
 
-        const filePath = path.join(__dirname, "d", p);
+        const filePath = path.join(__dirname, "uzair", p);
         const rr = await axios.get(dat.downloadLink, {
             responseType: "arraybuffer"
         });
         fs.writeFileSync(filePath, Buffer.from(rr.data));
 
-        music = `${req.protocol}://${req.get("host")}/d/${p}`;
+        music = `${req.protocol}://${req.get("host")}/uzair/${p}`;
 
         res.json({
             title: dat.title || "",
@@ -44,7 +44,7 @@ app.get("/ytdip", async (req, res) => {
             quality: dat.quality || "",
             downloadLink: music,
             size: dat.size || "",
-            author: "亗ㅤƊᎥᎮㅤƬᴏㅤ亗"
+            author: "Uzair Rajput"
         });
     } catch (error) {
         console.log(error)
@@ -52,7 +52,7 @@ app.get("/ytdip", async (req, res) => {
     }
 });
 
-app.use("/d", express.static(path.join(__dirname, "d")));
+app.use("/uzair", express.static(path.join(__dirname, "uzair")));
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
