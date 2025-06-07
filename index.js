@@ -6,6 +6,9 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ✅ Static files (MP3/MP4)
+app.use("/uzair", express.static(path.join(__dirname, "uzair")));
+
 app.get("/ytdip", async (req, res) => {
     const { link, format } = req.query;
 
@@ -15,41 +18,40 @@ app.get("/ytdip", async (req, res) => {
 
     try {
         let filename, data;
-        const apiUrl = `https://uzair-sehar-api.onrender.com/dipto/ytDlfuk?link=${link}&format=${format}`;
+        const baseUrl = "https://uzair-sehar-api.onrender.com"; // ✅ Full external URL
 
-        const response = await axios.get(apiUrl);
+        const response = await axios.get(`${baseUrl}/dipto/ytDlfuk?link=${link}&format=${format}`);
         data = response.data;
 
-        filename = format === "mp3" ? `audio_${link}.mp3` : `video_${link}.mp4`;
-
+        filename = `${format}_${link}.${format}`;
         const filePath = path.join(__dirname, "uzair", filename);
-        const fileData = await axios.get(data.downloadLink, { responseType: "arraybuffer" });
 
-        fs.writeFileSync(filePath, Buffer.from(fileData.data));
+        const fileDownload = await axios.get(data.downloadLink, {
+            responseType: "arraybuffer"
+        });
 
-        const fileUrl = `${req.protocol}://${req.get("host")}/uzair/${filename}`;
+        fs.writeFileSync(filePath, Buffer.from(fileDownload.data));
+
+        const fullLink = `${req.protocol}://${req.get("host")}/uzair/${filename}`;
 
         res.json({
             title: data.title || "",
             format,
             quality: data.quality || "",
+            downloadLink: fullLink,
             size: data.size || "",
-            downloadLink: fileUrl,
             author: "Uzair Rajput"
         });
-
     } catch (error) {
-        console.error("Error:", error.message);
-        res.status(500).json({ error: "Failed to fetch/download video.", details: error.message });
+        console.error("❌ Error downloading:", error.message);
+        res.status(500).json({ error: "Failed to fetch or download file.", details: error.message });
     }
 });
-
-app.use("/uzair", express.static(path.join(__dirname, "uzair")));
 
 app.get("/", (req, res) => {
     res.send("✅ YouTube Downloader API is running!");
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is live on http://localhost:${PORT}`);
 });
