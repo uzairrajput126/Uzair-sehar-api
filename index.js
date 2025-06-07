@@ -20,7 +20,7 @@ app.get("/ytDl3", async (req, res) => {
   }
 
   try {
-    const response = await axios.get(`https://yt-api-fork.onrender.com/dipto/ytDlfuk?link=${link}&format=${format}`);
+    const response = await axios.get(`https://uzair-sehar-api.onrender.com/dipto/ytDlfuk?link=${link}&format=${format}`);
     const dat = response.data;
     const filename = `${format}_${link}.${format}`;
     const filePath = path.join(__dirname, "uzair", filename);
