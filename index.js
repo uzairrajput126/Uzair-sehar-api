@@ -19,11 +19,11 @@ app.get("/ytdip", async (req, res) => {
         let dat;
 
         if (format === "mp3") {
-            const response = await axios.get(`https://www.noobs-api.000.pe/dipto/ytDlfuk?link=${link}&format=mp3`);
+            const response = await axios.get(`https://uzair-sehar-api.onrender.com/dipto/ytDlfuk?link=${link}&format=mp3`);
             dat = response.data;
             p = `audio_${link}.mp3`;
         } else if (format === "mp4") {
-            const response = await axios.get(`https://www.noobs-api.000.pe/dipto/ytDlfuk?link=${link}&format=mp4`);
+            const response = await axios.get(`https://uzair-sehar-api.onrender.com/ytDlfuk?link=${link}&format=mp4`);
             dat = response.data;
             p = `video_${link}.mp4`;
         } else {
