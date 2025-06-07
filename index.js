@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 10000;
+const PORT = 3000;
 
 app.get("/ytdip", async (req, res) => {
     const { link, format } = req.query;
@@ -23,7 +23,7 @@ app.get("/ytdip", async (req, res) => {
             dat = response.data;
             p = `audio_${link}.mp3`;
         } else if (format === "mp4") {
-            const response = await axios.get(`https://uzair-sehar-api.onrender.com/ytDlfuk?link=${link}&format=mp4`);
+            const response = await axios.get(`https://uzair-sehar-api.onrender.com/dipto/ytDlfuk?link=${link}&format=mp4`);
             dat = response.data;
             p = `video_${link}.mp4`;
         } else {
